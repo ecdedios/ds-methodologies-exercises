@@ -1,30 +1,7 @@
+import os
 from pandas import DataFrame
 from sklearn.preprocessing import LabelEncoder
-
-
-def drop_column(df, col):
-    return df.drop(columns=[col])
-
-def rename_column(df, col_old, col_new):
-    return df.rename(columns={col_old: col_new})
-
-def fill_null(df, col_name, col_value):
-    return df.col_name.fillna(col_value, inplace=True)
-
-
-def encode_species(df):
-    encoder = LabelEncoder()
-    encoder.fit(df.species)
-    return df.assign(species_encode = encoder.transform(df.species))
-
-
-def prep_iris_data(df):
-    df = df.drop(['species_id', 'measurement_id'], axis=1)
-    df = df.rename(columns={'species_name': 'species'})
-    encoder = LabelEncoder()
-    encoder.fit(df.species)
-    return df.assign(species_encode = encoder.transform(df.species))
-
+import acquire
 
 def handle_missing_values(df):
     return df.assign(
@@ -45,4 +22,13 @@ def prep_titanic_data(df):
         .pipe(handle_missing_values)\
         .pipe(remove_columns)\
         .pipe(encode_embarked)
+    return df
+
+def prep_iris_data(df):
+    df = acquire.get_iris_data()
+    df = df.drop(['species_id', 'measurement_id'], axis=1)
+    df = df.rename(columns={'species_name': 'species'})
+    encoder = LabelEncoder()
+    encoder.fit(df.species)
+    df.species = encoder.transform(df.species)
     return df
