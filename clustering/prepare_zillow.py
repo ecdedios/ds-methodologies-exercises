@@ -21,11 +21,11 @@ def join_zillow_data():
 	return df
 
 
-def single_only(df):
+def make_single_only(df):
 	'''
 	include only single unit properties (e.g. no duplexes, no land/lot, ...)
 	'''
-	return df.loc[df['unitcnt'] == 1].head(10)
+	return df.loc[(df['unitcnt'] == 1) | ((df['bathroomcnt'] >= 1) & (df['bathroomcnt'] <= 7))]
 
 
 def convert_to_string(df, *cols):
@@ -38,7 +38,48 @@ def convert_to_string(df, *cols):
     return df
 
 
+def missing_values_col(df):
+	'''
+	Write or use a previously written function to return the
+	total missing values and the percent missing values by column.
+	'''
+    null_count = df.isnull().sum()
+    null_percentage = (null_count / df.shape[0]) * 100
+    empty_count = pd.Series(((df == ' ') | (df == '')).sum())
+    empty_percentage = (empty_count / df.shape[0]) * 100
+    nan_value = pd.Series(((df == 'nan') | (df == 'NaN')).sum())
+    nan_percentage = (nan_value / df.shape[0]) * 100
+    return pd.DataFrame({'num_missing': null_count, 'percentage': null_percentage,
+                         'num_empty': empty_count, 'nan_value': nan_value})
+
+
+def missing_values_row(df):
+	'''
+	Write or use a previously written function to return the
+	total missing values and the percent missing values by row.
+	'''
+    null_count = df.isnull().sum(axis=1)
+    null_percentage = (null_count / df.shape[1]) * 100
+    return pd.DataFrame({'num_missing': null_count, 'percentage': null_percentage})
+
+
+def fill_with_zeroes(df, *cols):
+	'''
+	Write a function that will take a dataframe and list of
+	column names as input and return the dataframe with the
+	null values in those columns replace by 0.
+	'''
+    for col in cols:
+        df[col] = df[col].fillna(0)
+    return df
+
+
 def prep_zillow_data():
 	df = join_zillow_data()
-	single_only(df)
-	convert_to_string(df)
+	make_single_only(df)
+	convert_to_string(df, 'id', 'airconditioningtypeid', 'architecturalstyletypeid', 'buildingclasstypeid',
+                  'buildingqualitytypeid', 'decktypeid', 'fips', 'hashottuborspa', 'heatingorsystemtypeid',
+                  'pooltypeid10', 'pooltypeid2', 'pooltypeid7', 'propertylandusetypeid', 'rawcensustractandblock',
+                  'regionidcity', 'regionidcounty', 'regionidneighborhood', 'regionidzip', 'storytypeid',
+                  'typeconstructiontypeid', 'fireplaceflag', 'taxdelinquencyflag' )
+

@@ -1,19 +1,20 @@
 def summarize_data(df):
     
-    print(f'HEAD\n{head_df}', end='\n\n')
     head_df = df.head()
+    print(f'HEAD\n{head_df}', end='\n\n')
    
-    print(f'TAIL\n{tail_df}', end='\n\n')
     tail_df = df.tail()
+    print(f'TAIL\n{tail_df}', end='\n\n')
 
-    print(f'SHAPE: {shape_tuple}', end='\n\n')
     shape_tuple = df.shape
-
-    print(f'DESCRIPTION\n{describe_df}', end='\n\n')
+    print(f'SHAPE: {shape_tuple}', end='\n\n')
+    
     describe_df = df.describe()
-
-    print(f'INFORMATION')
+    print(f'DESCRIPTION\n{describe_df}', end='\n\n')
+    
     df.info()
+    print(f'INFORMATION')
+    
 
     print(f'VALUE COUNTS', end='\n\n')
     for col in df.columns:
