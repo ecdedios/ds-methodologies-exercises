@@ -1,3 +1,4 @@
-classification/__pycache__/
+__pycache__/
 *.csv
-
+env.py
+.ipynb_checkpoints
