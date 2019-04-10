@@ -4,7 +4,7 @@ import env
 def get_connection(db, user=env.user, host=env.host, password=env.password):
 	'''
 	Open a connection to a mySQL database. The name of the database
-	should bethe input to this function. Make sure your database
+	should be the input to this function. Make sure your database
 	credentials are not included in this file.
 	'''
 	return f'mysql+pymysql://{user}:{password}@{host}/{db}'
