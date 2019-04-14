@@ -32,7 +32,7 @@ from matplotlib.figure import Figure
 from sklearn.cluster import KMeans
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, median_absolute_error
 from sklearn.feature_selection import f_regression
-
+from sklearn.preprocessing import PolynomialFeatures
 
 
 # ===========
@@ -534,13 +534,47 @@ def model_linreg(X_train, y_train, features):
 	y_pred_lm0 = lm0.predict(X_train[features])
 
 	mse_lm0 = mean_squared_error(y_train, y_pred_lm0)
-	print("lm0\n  mse: {:.3}".format(mse_lm0)) 
+	print("Linear Model\n  mean_squared_error: {:.3}".format(mse_lm0)) 
 
 	r2_lm0 = r2_score(y_train, y_pred_lm0)
 
 	print('  {:.2%} of the variance in the log error can be explained by the number of square feet.'.format(r2_lm0))
 
 	return lm0, r2_lm0
+
+
+def model_polyreg(X, y, features):
+	lin = LinearRegression() 	  
+	lin.fit(X, y)
+
+	poly = PolynomialFeatures(degree = 4) 
+	X_poly = poly.fit_transform(X) 
+	poly.fit(X_poly, y) 
+
+	lin2 = LinearRegression() 
+	lin2.fit(X_poly, y)
+
+	# Visualising the Linear Regression results 
+	plt.scatter(X, y, color = 'blue') 
+	  
+	plt.plot(X, lin.predict(X), color = 'red') 
+	plt.title('Linear Regression') 
+	plt.xlabel('Temperature') 
+	plt.ylabel('Pressure') 
+	  
+	plt.show()
+
+	# Visualising the Polynomial Regression results 
+	plt.scatter(X, y, color = 'blue') 
+	  
+	plt.plot(X, lin2.predict(poly.fit_transform(X)), color = 'red') 
+	plt.title('Polynomial Regression') 
+	plt.xlabel('Temperature') 
+	plt.ylabel('Pressure') 
+	  
+	plt.show()
+
+
 
 
 
