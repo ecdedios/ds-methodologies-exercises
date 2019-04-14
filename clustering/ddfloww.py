@@ -30,6 +30,8 @@ import seaborn as sns
 from sklearn.linear_model import LinearRegression
 from matplotlib.figure import Figure
 from sklearn.cluster import KMeans
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, median_absolute_error
+from sklearn.feature_selection import f_regression
 
 
 
@@ -463,7 +465,7 @@ def plot_swarm(df, x, y, h):
 	# TODO: replace this with another plot that run quickly.
 
 
-def validate_tts(X_train, y_train, X_test, y_test):
+def validate_tts(X_train, y_train, X_test, y_test, train, test):
     if X_train.shape[0] == y_train.shape[0]:
         print("X & y train rows ARE equal")
     else:
@@ -506,9 +508,39 @@ def validate_tts(X_train, y_train, X_test, y_test):
 # 	plt.title('The Elbow Method Showing the Optimal k')
 # 	plt.show()
 
-def add_clusters(df, col, estimators=[2,3]):
-	pass
+# def add_clusters(df, col, estimators=[2,3]):
+# 	pass
 
+
+def model_linreg(X_train, y_train, features):
+	# Create linear regression objects
+	lm0 = LinearRegression()
+	print(lm0)
+
+	lm0.fit(X_train[features], y_train)
+	print(lm0)
+
+	lm0_y_intercept = lm0.intercept_
+	print(lm0_y_intercept)
+
+	lm0_coefficients = lm0.coef_
+	print(lm0_coefficients)
+
+	print()
+	print('Univariate - log error = b + m1 * square feet')
+	print('    y-intercept  (b): %.2f' % lm0_y_intercept)
+	print('    coefficient (m1): %.2f' % lm0_coefficients[0][0])
+
+	y_pred_lm0 = lm0.predict(X_train[features])
+
+	mse_lm0 = mean_squared_error(y_train, y_pred_lm0)
+	print("lm0\n  mse: {:.3}".format(mse_lm0)) 
+
+	r2_lm0 = r2_score(y_train, y_pred_lm0)
+
+	print('  {:.2%} of the variance in the log error can be explained by the number of square feet.'.format(r2_lm0))
+
+	return lm0, r2_lm0
 
 
 
