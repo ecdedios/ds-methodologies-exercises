@@ -16,16 +16,15 @@ def get_data(location):
 		df = pd.concat([df, pd.DataFrame(data['payload'][location])])
 	return df
 
-
 df_items = get_data('items')
 df_stores = get_data('stores')
 df_sales = get_data('sales')
 
-df = df_sales.join(df_items.set_index('item_id'), on='item', how='inner')
-df = df.join(df_stores.set_index('store_id'), on='store', how='inner')
+# df = df_sales.join(df_items.set_index('item_id'), on='item', how='inner')
+# df = df_sales.join(df_stores.set_index('store_id'), on='store', how='inner')
 
 # df = pd.merge(df_items, df_sales, how='left', left_on='item_id', right_on='item')
 # df = pd.merge(df_stores, df_sales, how='left', left_on='store_id', right_on='store')
 
-print(df.shape)
-print(df.columns)
+print(f'SHAPE: {df.shape}')
+print(f'COLUMNS: {df.columns}')
