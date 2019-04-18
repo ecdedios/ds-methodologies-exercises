@@ -2,3 +2,4 @@ __pycache__/
 *.csv
 env.py
 .ipynb_checkpoints
+*.log

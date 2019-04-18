@@ -38,7 +38,9 @@ def get_data(location):
 
 	for i in range((data['payload']['max_page'])):
 		print(base_url + '/api/v1/' + location + '?page=' + (str(i+1)))
+		response = requests.get(base_url + '/api/v1/' + location + '?page=' + (str(i+1)))
 		data = response.json()
+		print(df.shape)
 		df = pd.concat([df, pd.DataFrame(data['payload'][location])])
 	return df
 
@@ -53,8 +55,11 @@ df_stores.to_csv('data_stores.csv')
 df_sales.to_csv('data_sales.csv')
 
 # Merge all three dataframes together into one big dataframe
-df = df_sales.join(df_items.set_index('item_id'), on='item', how='inner')
-df = df.join(df_stores.set_index('store_id'), on='store', how='inner')
+# df = df_sales.join(df_items.set_index('item_id'), on='item', how='inner')
+# df = df.join(df_stores.set_index('store_id'), on='store', how='inner')\
+
+df = pd.merge(df_sales, df_items, how='left', left_on='item', right_on='item_id')
+df = pd.merge(df, df_stores, how='left', left_on='store', right_on='store_id')
 
 # Check shape for validity after merge
 print(f'SHAPE: {df.shape}')
