@@ -7,12 +7,13 @@ http://python.zach.lol/access.log
 
 
 
+
 # ===========
 # ENVIRONMENT
 # ===========
 
 
-import acquire
+import acquire as ac
 import os
 import sys
 import pandas as pd
@@ -28,7 +29,7 @@ from datetime import datetime
 # =======
 
 
-df = get_data()
+# imported from acquire.py
 
 
 
@@ -38,71 +39,11 @@ df = get_data()
 # =======
 
 
-def parse_log(loglines):
-    """
-    Parses records from the access log and returns a dataframe.
-    """
-
-    logs = []
-
-    for logline in loglines:
-        log = logline.split(' ')
-
-        ip_address = log[0]
-
-        timestamp = (log[3] + ' ' + log[4]).replace(' ', '')
-        timestamp = timestamp.replace(']', '')
-        timestamp = timestamp.replace('[', '')
-
-        http_method = (log[5]).replace('\"', '')
-        path = (log[6]).replace('\"', '')
-        protocol = (log[7]).replace('\"', '')
-        status = int(log[8])
-        size = int(log[9])
-        user_agent = log[11].replace('\"', '')
-        
-        log_string = [ip_address,
-                      timestamp,
-                      http_method,
-                      path,
-                      protocol,
-                      status,
-                      size,
-                      user_agent]
-        print(log_string)
-
-        logs.append(log_string)
-        logs
-
-    return pd.DataFrame(logs,columns=['ip_address',
-                                      'timestamp',
-                                      'http_method',
-                                      'path',
-                                      'protocol',
-                                      'status',
-                                      'size',
-                                      'user_agent'])
-
-
 def remove_space(df, column):
     """
     Removes the colon between date and hour.
     """
     return df[column].str.replace(':', ' ', 1)
-
-
-def convert_to_datetime(df, column):
-    """
-    Converts string object to datetime object.
-    """
-    return pd.to_datetime(df[column])
-
-
-def set_utc(df, locale):
-    """
-    Converts to UTC time.
-    """
-    return df.tz_localize('utc').tz_convert(locale)
 
 
 def process_datetime(df, column, locale):
@@ -115,6 +56,26 @@ def process_datetime(df, column, locale):
     return set_utc(df, locale)
 
 
+# Write a function to convert a date to a datetime data type.
+def convert_to_datetime(df, column):
+    """
+    Converts string object to datetime object.
+    """
+    datetime_format = '%a, %d %b %Y %H:%M:%S %Z'
+    return pd.to_datetime(df[column], format=datetime_format)
+
+
+# Write a function to change a datetime to UTC.
+def set_utc(df, locale):
+    """
+    Converts to UTC time.
+    """
+    return df.tz_localize('utc').tz_convert(None)
+
+
+# Write a function to parse a date column into 6 additional
+# columns (while keeping the original date): year, quarter,
+# month, day of month, day of week, weekend vs. weekday¶
 def add_year(df, column):
     return df[column].dt.year
 
@@ -135,8 +96,13 @@ def add_hour(df, column):
     return df[column].dt.hour
 
 
-def add_weekday(df, column):
+def add_dayofweek(df, column):
     return df[column].dt.weekday
+    
+
+def add_weekday(df, column):
+    # return df[column].dt.weekday
+    return ((pd.DatetimeIndex(df[column]).weekday) // 5 == 1).astype(float)
 
 
 def add_date_columns(df, column):
@@ -145,9 +111,18 @@ def add_date_columns(df, column):
     df['quarter'] = add_quarter(df, column)
     df['month'] = add_month(df, column)
     df['day'] = add_day(df, column)
-    df['hour'] = add_hour(df, column)
+    df['dayofweek'] = add_dayofweek(df, column)
     df['weekday'] = add_weekday(df, column)
     return df
+
+
+# Add a column to your dataframe, sales_total, which is a
+# derived from sale_amount (total items) and item_price.
+def add_sum_total(df, column1, column2):
+    return df[column1] * df[column2]
+
+
+#
 
 
 
@@ -167,9 +142,33 @@ def main():
     """
     Main entry point for the script.
     """
-    df = parse_log(get_log())
-    df = process_datetime(df, 'timestamp', 'America/Chicago')
-    df = add_date_columns(df, 'timestamp')
+    df = ac.get_data()
+    df['sale_date'] = convert_to_datetime(df, 'sale_date')
+    df = df.set_index('sale_date')
+    df = set_utc(df, 'America/Chicago')
+    df = add_date_columns(df, 'sale_date')
+    df['sales_total'] = add_sum_total(df, 'sale_amount', 'item_price')
+
+    # Create a new dataframe that aggregates the sales_total and
+    # sale_amount(item count) using sum and median by day of week.
+    df_stotal_sum = pd.DataFrame(df.groupby('weekday')['sales_total'].sum())
+    df_stotal_mean = pd.DataFrame(df.groupby('weekday')['sales_total'].mean())
+    df_samount_sum = pd.DataFrame(df.groupby('weekday')['sale_amount'].sum())
+    df_samount_mean = pd.DataFrame(df.groupby('weekday')['sale_amount'].mean())
+    dfa = pd.merge(df_stotal_sum, df_stotal_mean, right_index=True, left_index=True)
+    dfb = pd.merge(df_samount_sum, df_samount_mean, right_index=True, left_index=True)
+    dfc = pd.merge(dfa, dfb, right_index=True, left_index=True)
+    dfc.columns = ['sales_total_sum', 'sales_total_mean', 'sales_amount_sum', 'sales_amount_mean']
+
+    # Explore the pandas DataFrame.diff() function. Create a new
+    # column that is the result of the current sales - the previous
+    # days sales.
+    df['sales_diff'] = df.sales_total.diff()
+
+    # Write a function to set the index to be the datetime variable.
+    df = df.set_index('sale_date')
+
+    print('Done and doner.')
 
     print(df.head(10))
 
