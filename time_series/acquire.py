@@ -3,9 +3,8 @@
 """
 This script contains code used by the following jupytr notebooks:
 
-1. 
-2. 
-3. 
+- dd_acquire.ipynb
+- jesse_acquire.ipynb 
 
 Special care taken to avoid hardcoding as much as possible.
 """
@@ -67,6 +66,12 @@ def get_data():
 	df = pd.merge(df, df_stores, on='store_id')
 
 	return df
+
+def get_store_data():
+    """
+    Gets all the data by reading from csv files.
+    """
+    return pd.read_csv('saas.csv')
 
 # Merge all three dataframes together into one big dataframe
 # df = df_sales.join(df_items.set_index('item_id'), on='item', how='inner')

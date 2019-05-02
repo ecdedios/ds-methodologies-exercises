@@ -122,27 +122,7 @@ def add_sum_total(df, column1, column2):
     return df[column1] * df[column2]
 
 
-#
-
-
-
-
-# ==================================================
-# MAIN
-# ==================================================
-
-
-def clear():
-    """
-    Clears the terminal screen.
-    """
-    os.system("cls" if os.name == "nt" else "clear")
-
-def main():
-    """
-    Main entry point for the script.
-    """
-    df = ac.get_data()
+def prep_data(df):
     df['sale_date'] = convert_to_datetime(df, 'sale_date')
     df = df.set_index('sale_date')
     df = set_utc(df, 'America/Chicago')
@@ -168,8 +148,29 @@ def main():
     # Write a function to set the index to be the datetime variable.
     df = df.set_index('sale_date')
 
-    print('Done and doner.')
+    return df, dfc
 
+
+
+
+# ==================================================
+# MAIN
+# ==================================================
+
+
+def clear():
+    """
+    Clears the terminal screen.
+    """
+    os.system("cls" if os.name == "nt" else "clear")
+
+def main():
+    """
+    Main entry point for the script.
+    """
+    df, dfc = prep_data(ac.get_data())
+
+    print('Done and doner.')
     print(df.head(10))
 
 

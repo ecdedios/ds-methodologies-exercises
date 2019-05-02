@@ -575,6 +575,49 @@ def model_polyreg(X, y, features):
 	plt.show()
 
 
+def plot_data_and_predictions(predictions, label):
+    plt.figure(figsize=(10, 8))
+
+    plt.plot(train,label='Train')
+    plt.plot(test, label='Test')
+    plt.plot(predictions, label=label, linewidth=5)
+
+    plt.legend(loc='best')
+    plt.show()
+
+
+def evaluate(actual, predictions, output=True):
+    mse = metrics.mean_squared_error(actual, predictions)
+    rmse = math.sqrt(mse)
+
+    if output:
+        print('MSE:  {}'.format(mse))
+        print('RMSE: {}'.format(rmse))
+    else:
+        return mse, rmse    
+
+def plot_and_eval(predictions, actual=test, metric_fmt='{:.2f}', linewidth=4):
+    if type(predictions) is not list:
+        predictions = [predictions]
+
+    plt.figure(figsize=(16, 8))
+    plt.plot(train,label='Train')
+    plt.plot(test, label='Test')
+
+    for yhat in predictions:
+        mse, rmse = evaluate(actual, yhat, output=False)        
+        label = f'{yhat.name}'
+        if len(predictions) > 1:
+            label = f'{label} -- MSE: {metric_fmt} RMSE: {metric_fmt}'.format(mse, rmse)
+        plt.plot(yhat, label=label, linewidth=linewidth)
+
+    if len(predictions) == 1:
+        label = f'{label} -- MSE: {metric_fmt} RMSE: {metric_fmt}'.format(mse, rmse)
+        plt.title(label)
+
+    plt.legend(loc='best')
+    plt.show()
+
 
 
 
