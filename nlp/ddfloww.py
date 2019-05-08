@@ -3,9 +3,10 @@
 """
 This script contains code used by the following jupytr notebooks:
 
-1. nlp.ipynb
-2. scraping.ipynb
-3.
+1. acquire-lesson.ipynb
+2. regex-lesson.ipynb
+3. parse.ipnyb
+
 """
 
 
@@ -18,8 +19,6 @@ import re
 
 from requests import get
 from bs4 import BeautifulSoup
-from django.urls import path
-# from functools import wraps, partial, WRAPPER_ASSIGNMENTS
 
 
 
@@ -63,6 +62,15 @@ def get_article_text():
         f.write(article.text)
 
     return article.text
+
+
+
+
+
+
+
+
+
 
 
 
