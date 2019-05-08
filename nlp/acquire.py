@@ -219,7 +219,7 @@ if __name__ == '__main__':
 
 __author__ = "Ednalyn C. De Dios, et al."
 __copyright__ = "Copyright 2019, Codeup Data Science"
-__credits__ = ["Maggie Guist", "Zach Gulde"]
+__credits__ = ["Maggie Guist", "Zach Gulde", "Ryan Orsinger"]
 __license__ = "MIT"
 __version__ = "1.0.0"
 __maintainer__ = "Ednalyn C. De Dios"
